@@ -16,6 +16,8 @@ set ruler
 set title
 " Highlight current line
 set cursorline
+" Change cursorline color
+hi CursorLine cterm=NONE ctermbg=234
 " Highlight searches
 set hlsearch
 " Ignore case of searches
@@ -37,7 +39,9 @@ Plugin 'VundleVim/Vundle.vim'
 
 " Plugins and its maps
 Plugin 'victorrattis/tcomment_vim'
-map <C-_> :TComment<CR>
+nnoremap <C-_> :TComment<CR>
+inoremap <C-_> <ESC>:TComment<CR>ga
+vnoremap <C-_> <ESC>:TComment<CR>gv
 
 Plugin 'rodrigoperazzo/whitespaces_vim'
 map <C-t>w :ToggleWhitespaces<CR>
