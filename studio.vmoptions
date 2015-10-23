@@ -1,0 +1,4 @@
+-Xms256m
+-Xmx2048m
+-XX:MaxPermSize=1024m
+-XX:ReservedCodeCacheSize=225m

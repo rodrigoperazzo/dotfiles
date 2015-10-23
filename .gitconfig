@@ -1,0 +1,31 @@
+[alias]
+    co = checkout
+    br = branch
+    ci = commit
+    st = status
+
+    # List commits in short form, with colors and branch/tag annotations
+    ls = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate
+    # List commits showing changed files
+    ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat
+    # List oneline commits showing dates
+    lds = log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short
+    # List commits in short form, but with graph markers
+    lg1 = log --all --decorate --oneline --graph --format='%Cblue%h - %Cgreen%s %Creset(%Cblue%an%Creset) %Cred%d%Creset'
+    lg2 = log       --decorate --oneline --graph --format='%Cblue%h - %Cgreen%s %Creset(%Cblue%an%Creset) %Cred%d%Creset'
+    # see all the commits related to a file, with the diff of the changes
+    filelog = log -u
+    fl = log -u
+
+    # Show last commig only
+    last = log -1 HEAD
+    # Show modified files in last commit
+    dl = "!git ll -1"
+    # Show a diff last commit
+    dlc = diff --cached HEAD^
+    # Add a change to latest commit, directly rebasing with it
+    up = "!git commit -a -m 'up' && git rebase -i HEAD~2"
+    # Format a patch from latest commit and asking for a output path
+    fp = "!f() { git format-patch -i HEAD~1 -o "$1"; }; f"
+    # Undo any change in current branch, including untracked ones
+    undo = "!git reset --hard && git clean -fd"
