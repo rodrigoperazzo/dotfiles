@@ -18,6 +18,6 @@
 #
 # ----------------------------------------------------------------------------------
 
-if [ -f ~/.bashrc ]; then
-   source ~/.bashrc
+if [ -f ~/.bash_profile ]; then
+    [ -z "$PS1"] && source ~/.bash_profile
 fi

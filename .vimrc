@@ -62,6 +62,9 @@ autocmd FileType text let b:noLLHi=1
 map <C-a> <ESC>gg<CR>vG
 " Write buffer
 map <C-o> <ESC>:w<CR>
+" Temporary map for esc key
+inoremap <C-e> <ESC>
+
 " Move text
 nnoremap <C-j> :m .+1<CR>
 nnoremap <C-k> :m .-2<CR>
