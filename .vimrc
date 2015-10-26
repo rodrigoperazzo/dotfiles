@@ -28,6 +28,11 @@ set incsearch
 nnoremap <F2> :set invpaste paste?<CR>
 set pastetoggle=<F2>
 set showmode
+"Store lots of :cmdline history
+set history=1000
+
+"Store lots of :cmdline his:y
+set history=1000
 
 "=========== Vundle ===========
 filetype off
