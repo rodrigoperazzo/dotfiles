@@ -123,8 +123,24 @@ install_vmoptions () {
     link_file "$DOTFILES_ROOT/studio.vmoptions" "$studio_prefs/studio.vmoptions"
 }
 
+install_vundle () {
+    if [ ! -d ~/.vim ]; then
+        mkdir ~/.vim
+    fi
+
+    if [ ! -d ~/.vim/bundle/Vundle.vim ]
+    then
+        git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+        success "install vundle"
+    fi
+
+    # Execute Vundle plugin to install all plugins added
+    vim +PluginInstall +qall
+}
+
 install_dotfiles
 install_vmoptions
+install_vundle
 
 echo ''
 echo '  All installed!'
