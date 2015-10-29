@@ -5,7 +5,6 @@
 # This script was "forked" from holman/dotfiles.
 
 DOTFILES_ROOT=$(pwd -P)
-LIBRARY_PREFS="$HOME/Library/Preferences"
 
 set -e
 
@@ -37,10 +36,8 @@ link_file () {
 
   if [ -f "$dst" -o -d "$dst" -o -L "$dst" ]
   then
-
     if [ "$overwrite_all" == "false" ] && [ "$backup_all" == "false" ] && [ "$skip_all" == "false" ]
     then
-
       local currentSrc="$(readlink $dst)"
 
       if [ "$currentSrc" == "$src" ]
@@ -118,9 +115,32 @@ install_dotfiles () {
 }
 
 install_vmoptions () {
-    studio_versions="$LIBRARY_PREFS/Android*"
-    studio_prefs=$(ls -t $studio_versions | awk '{print substr($0, 0, length($0)-1);exit}')
-    link_file "$DOTFILES_ROOT/studio.vmoptions" "$studio_prefs/studio.vmoptions"
+    info 'installing studio.vmoptions'
+
+    local overwrite_all=false backup_all=false skip_all=false
+    local vmoptions_file="studio.vmoptions"
+
+    if [ "$(uname -s)" == "Darwin" ]
+    then
+        studio_dir="$HOME/Library/Preferences"
+        studio_name="AndroidStudio*"
+    else
+        studio_dir="$HOME"
+        studio_name=".AndroidStudio*"
+        if [ "$(uname -m)" == "x86_64" ]
+        then
+            vmoptions_file="studio64.vmoptions"
+        fi
+    fi
+
+    # creates a link only to the most recent studio
+    studio_prefs=$(find -H $studio_dir -maxdepth 1 -type d -name $studio_name)
+    studio_last_version=$(echo "$studio_prefs" | sort -r | head -1)
+
+    if [ ! -z "$studio_last_version" ]
+    then
+        link_file "$DOTFILES_ROOT/studio.vmoptions" "$studio_last_version/$vmoptions_file"
+    fi
 }
 
 install_vundle () {
