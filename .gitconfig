@@ -29,3 +29,6 @@
     fp = "!f() { git format-patch -i HEAD~1 -o "$1"; }; f"
     # Undo any change in current branch, including untracked ones
     undo = "!git reset --hard && git clean -fd"
+
+    # Multiple users
+    user = "!bash git-user.sh"
