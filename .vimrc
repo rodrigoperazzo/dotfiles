@@ -45,7 +45,7 @@ nnoremap <C-_> :TComment<CR>
 inoremap <C-_> <ESC>:TComment<CR>ga
 vnoremap <C-_> <ESC>:TComment<CR>gv
 
-Plugin 'rodrigoperazzo/whitespaces_vim'
+Plugin 'rodrigoperazzo/vim-whitespaces'
 map <C-t>w :ToggleWhitespaces<CR>
 
 " Required, Plugins must be added before the following line
