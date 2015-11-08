@@ -1,0 +1,143 @@
+#!/usr/bin/env bash
+
+# TODO
+# test each of these settings
+# hangout always on first screen?
+# default screen always on macbook?
+# keyboard max repeat speed and minimum delay
+# ...
+
+
+# Ask for the administrator password upfront
+sudo -v
+
+# Keep-alive: update existing `sudo` time stamp until `.osx` has finished
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+
+# affected apps
+apps=()
+
+###############################################################################
+# General UI/UX                                                               #
+###############################################################################
+
+# Automatically quit printer app once the print jobs complete
+# defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
+
+# Disable the “Are you sure you want to open this application?” dialog
+# defaults write com.apple.LaunchServices LSQuarantine -bool false
+
+# Reveal IP address, hostname, OS version, etc. when clicking the clock
+# in the login window
+# sudo defaults write /Library/Preferences/com.apple.loginwindow AdminHostInfo HostName
+
+# Restart automatically if the computer freezes
+# sudo systemsetup -setrestartfreeze on
+
+###############################################################################
+# Trackpad, mouse, keyboard, Bluetooth accessories, and input                 #
+###############################################################################
+
+# Trackpad: enable tap to click for this user and for the login screen
+# defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
+# defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
+# defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
+
+# Disable press-and-hold for keys in favor of key repeat
+# defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
+
+# Set a blazingly fast keyboard repeat rate
+# defaults write NSGlobalDomain KeyRepeat -int 0
+
+###############################################################################
+# Screen                                                                      #
+###############################################################################
+
+# Save screenshots to the desktop
+# defaults write com.apple.screencapture location -string "${HOME}/Desktop"
+
+# Save screenshots in PNG format (other options: BMP, GIF, JPG, PDF, TIFF)
+# defaults write com.apple.screencapture type -string "png"
+
+###############################################################################
+# Finder                                                                      #
+###############################################################################
+
+# Add Finder to apps list
+# apps+=("Finder")
+
+# Finder: show all filename extensions
+# defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+
+# Avoid creating .DS_Store files on network volumes
+# defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+
+# Automatically open a new Finder window when a volume is mounted
+# defaults write com.apple.frameworks.diskimages auto-open-ro-root -bool true
+# defaults write com.apple.frameworks.diskimages auto-open-rw-root -bool true
+# defaults write com.apple.finder OpenWindowForNewRemovableDisk -bool true
+
+# Disable the warning before emptying the Trash
+# defaults write com.apple.finder WarnOnEmptyTrash -bool false
+
+# Empty Trash securely by default
+# defaults write com.apple.finder EmptyTrashSecurely -bool true
+
+# Show the ~/Library folder
+# chflags nohidden ~/Library
+
+###############################################################################
+# Dock                                                                        #
+###############################################################################
+
+# Add Dock to apps list
+apps+=("Dock")
+
+# Enable highlight hover effect for the grid view of a stack (Dock)
+defaults write com.apple.dock mouse-over-hilite-stack -bool true
+
+# Set the icon size of Dock items to 56 pixels
+defaults write com.apple.dock tilesize -int 56
+
+# Set the orientation of Dock to bottom
+defaults write com.apple.dock orientation -string "bottom"
+
+# Change minimize/maximize window effect to a fast one
+defaults write com.apple.dock mineffect -string "scale"
+
+# Minimize windows into their application’s icon
+defaults write com.apple.dock minimize-to-application -bool true
+
+# Enable spring loading for all Dock items
+defaults write com.apple.dock enable-spring-load-actions-on-all-items -bool true
+
+# Show indicator lights for open applications in the Dock
+defaults write com.apple.dock show-process-indicators -bool true
+
+###############################################################################
+# Terminal & iTerm 2                                                          #
+###############################################################################
+
+# Install the Solarized Dark theme for iTerm
+# open "${HOME}/init/Solarized Dark.itermcolors"
+
+# Don’t display the annoying prompt when quitting iTerm
+# defaults write com.googlecode.iterm2 PromptOnQuit -bool false
+
+###############################################################################
+# Sublime Text                                                                #
+###############################################################################
+
+# Install Sublime Text settings
+# cp -r init/Preferences.sublime-settings ~/Library/Application\ Support/Sublime\ Text*/Packages/User/Preferences.sublime-settings 2> /dev/null
+
+###############################################################################
+# Kill affected applications                                                  #
+###############################################################################
+
+for app in "${apps[@]}"; do
+    killall "${app}" &> /dev/null
+done
+
+echo "Done. Note that some of these changes require a logout/restart to take effect."
+
