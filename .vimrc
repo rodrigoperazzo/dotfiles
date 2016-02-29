@@ -3,7 +3,7 @@ set nocompatible
 " Enable syntax highlighting
 syntax enable
 " Use the Delek theme
-colorscheme delek
+colorscheme solarized
 " Enable line numbers
 set number
 " Convert tabs as 4 spaces
@@ -59,7 +59,7 @@ fun! LongLineHighlight()
     if exists('b:noLLHi')
         return
     endif
-    match ErrorMsg '\%>99v.\+'
+    " match ErrorMsg '\%>99v.\+'
 endfun
 autocmd VimEnter * call LongLineHighlight()
 autocmd FileType text let b:noLLHi=1

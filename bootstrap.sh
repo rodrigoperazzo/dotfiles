@@ -158,9 +158,39 @@ install_vundle () {
     vim +PluginInstall +qall
 }
 
+install_custom_ui (){
+
+    projects="$HOME/Projects"
+    if [ ! -d "$projects" ]; then
+        mkdir $projects
+    fi
+
+    # change the default shell
+    chsh -s /bin/zsh
+    # oh my zsh
+    sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+
+    # solarized themes
+    if [ ! -d "$projects/solarized" ]; then
+        git clone https://github.com/altercation/solarized.git "$projects/solarized"
+    fi
+    # vim
+    if [ ! -d "$HOME/.vim/colors" ]; then
+        mkdir -p "$HOME/.vim/colors"
+    fi
+    cp "$projects/solarized/vim-colors-solarized/colors/solarized.vim" "$HOME/.vim/colors/"
+
+    # powerline fonts
+    if [ ! -d "$projects/powerline-fonts" ]; then
+        git clone https://github.com/powerline/fonts.git "$projects/powerline-fonts"
+    fi
+    bash "$projects/powerline-fonts/install.sh"
+}
+
 install_dotfiles
 install_vmoptions
 install_vundle
+install_custom_ui
 
 echo ''
 echo '  All installed!'
