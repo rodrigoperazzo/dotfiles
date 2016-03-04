@@ -11,19 +11,19 @@ set -e
 echo ''
 
 info () {
-  printf "\r  [ \033[00;34m..\033[0m ] $1\n"
+  printf "\r  [ \033[00;34m..\033[0m ] %s\n" "$1"
 }
 
 user () {
-  printf "\r  [ \033[0;33m??\033[0m ] $1\n"
+  printf "\r  [ \033[0;33m??\033[0m ] %s\n" "$1"
 }
 
 success () {
-  printf "\r\033[2K  [ \033[00;32mOK\033[0m ] $1\n"
+  printf "\r\033[2K  [ \033[00;32mOK\033[0m ] %s\n" "$1"
 }
 
 fail () {
-  printf "\r\033[2K  [\033[0;31mFAIL\033[0m] $1\n"
+  printf "\r\033[2K  [\033[0;31mFAIL\033[0m] %s\n" "$1"
   echo ''
   exit
 }
@@ -31,14 +31,15 @@ fail () {
 link_file () {
   local src=$1 dst=$2
 
-  local overwrite= backup= skip=
-  local action=
+  local overwrite='' backup='' skip=''
+  local action=''
 
-  if [ -f "$dst" -o -d "$dst" -o -L "$dst" ]
+  if [ -f "$dst" ] || [ -d "$dst" ] || [ -L "$dst" ]
   then
     if [ "$overwrite_all" == "false" ] && [ "$backup_all" == "false" ] && [ "$skip_all" == "false" ]
     then
-      local currentSrc="$(readlink $dst)"
+      local currentSrc=''
+      currentSrc=$(readlink "$dst")
 
       if [ "$currentSrc" == "$src" ]
       then
@@ -49,7 +50,7 @@ link_file () {
 
         user "File already exists: $dst ($(basename "$src")), what do you want to do?\n\
         [s]kip, [S]kip all, [o]verwrite, [O]verwrite all, [b]ackup, [B]ackup all?"
-        read -n 1 action
+        read -r -n 1 action
 
         case "$action" in
           o )
@@ -109,13 +110,19 @@ install_dotfiles () {
 
   for src in $(find -H "$DOTFILES_ROOT" -type f -name '.[^.]*')
   do
-    dst="$HOME/$(basename $src)"
-    link_file "$src" "$dst"
+    if [ "$ui" == "true" ] && [[ "$src" == *\.bash* ]]; then
+        info 'skipping bash files for custom terminal ui'
+    elif [ "$ui" != "true" ] && [[ "$src" == *\.zsh* ]]; then
+        info 'skipping zsh files for regular terminal ui'
+    else
+        dst="$HOME/$(basename "$src")"
+        link_file "$src" "$dst"
+    fi
   done
 }
 
 install_vmoptions () {
-    info 'installing studio.vmoptions'
+    info 'installing android studio options'
 
     local overwrite_all=false backup_all=false skip_all=false
     local vmoptions_file="studio.vmoptions"
@@ -134,7 +141,7 @@ install_vmoptions () {
     fi
 
     # creates a link only to the most recent studio
-    studio_prefs=$(find -H $studio_dir -maxdepth 1 -type d -name $studio_name)
+    studio_prefs=$(find -H "$studio_dir" -maxdepth 1 -type d -name "$studio_name")
     studio_last_version=$(echo "$studio_prefs" | sort -r | head -1)
 
     if [ ! -z "$studio_last_version" ]
@@ -144,6 +151,8 @@ install_vmoptions () {
 }
 
 install_vundle () {
+    info 'installing vim vundle'
+
     if [ ! -d ~/.vim ]; then
         mkdir ~/.vim
     fi
@@ -151,7 +160,9 @@ install_vundle () {
     if [ ! -d ~/.vim/bundle/Vundle.vim ]
     then
         git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-        success "install vundle"
+        success 'cloned vim vundle'
+    else
+        success 'skipped vim vundle'
     fi
 
     # Execute Vundle plugin to install all plugins added
@@ -159,34 +170,62 @@ install_vundle () {
 }
 
 install_custom_ui (){
+    info 'installing custom terminal ui'
+
+    local overwrite_all=false backup_all=false skip_all=false
 
     projects="$HOME/Projects"
     if [ ! -d "$projects" ]; then
-        mkdir $projects
+        mkdir "$projects"
     fi
 
-    # change the default shell
-    chsh -s /bin/zsh
-    # oh my zsh
-    sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+    if [ ! -d "$projects/oh-my-zsh" ]; then
+        # clone oh-my-zsh
+        export ZSH="$projects/oh-my-zsh"
+        git clone git://github.com/robbyrussell/oh-my-zsh.git "$projects/oh-my-zsh"
+
+        # change the default shell
+        chsh -s /bin/zsh
+
+        success 'cloned oh-my-zsh'
+    else
+        success 'skipped oh-my-zsh'
+    fi
 
     # solarized themes
     if [ ! -d "$projects/solarized" ]; then
         git clone https://github.com/altercation/solarized.git "$projects/solarized"
+        success 'cloned solarized'
+    else
+        success 'skipped solarized'
     fi
+
     # vim
     if [ ! -d "$HOME/.vim/colors" ]; then
         mkdir -p "$HOME/.vim/colors"
     fi
-    cp "$projects/solarized/vim-colors-solarized/colors/solarized.vim" "$HOME/.vim/colors/"
+    link_file "$projects/solarized/vim-colors-solarized/colors/solarized.vim" "$HOME/.vim/colors/solarized.vim"
 
     # powerline fonts
     if [ ! -d "$projects/powerline-fonts" ]; then
         git clone https://github.com/powerline/fonts.git "$projects/powerline-fonts"
+        bash "$projects/powerline-fonts/install.sh"
+        success 'cloned powerline-fonts'
+    else
+        success 'skipped powerline-fonts'
     fi
-    bash "$projects/powerline-fonts/install.sh"
 }
 
+ui=false
+case $1 in
+    -u | --ui)
+        ui=true
+        ;;
+esac
+
+if [ "$ui" == "true" ]; then
+    install_custom_ui
+fi
 install_dotfiles
 install_vmoptions
 install_vundle
